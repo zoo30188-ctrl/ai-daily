@@ -1,8 +1,18 @@
 // === AI Daily — 설정 및 상수 ===
 
-export const APP_VERSION = 'v2.2.0';
+export const APP_VERSION = 'v2.3.0';
 
 export const CHANGELOG = [
+  {
+    version: 'v2.3.0',
+    date: '2026-04-03',
+    changes: [
+      { type: 'feat', text: '데일리 모닝 브리핑 엔진 탑재 (단 1회의 API 호출 절약형 큐레이션)' },
+      { type: 'feat', text: '인앱 리더 모드(In-app Reader) 추가 (앱 스크롤 단절 및 이탈 방지)' },
+      { type: 'feat', text: 'API 미설정자를 위한 우아한 Fallback (RSS 미리보기) 노출 구현' },
+      { type: 'feat', text: '자동 생성된 핫클립 기사에 🔥 HOT 뱃지 및 해시태그 지원' }
+    ]
+  },
   {
     version: 'v2.2.0',
     date: '2026-04-03',

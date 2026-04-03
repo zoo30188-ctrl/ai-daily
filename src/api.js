@@ -145,10 +145,25 @@ export const handleSummary = async (item, btnEl, boxEl, { force = false } = {}) 
     }
   }
 
-  const { key: apiKey, source: keySource } = getApiKey();
+  const { key: apiKey } = getApiKey();
   if (!apiKey) {
-    showToast('우측 상단 ⚙️ 설정에서 Gemini API 키를 먼저 입력해주세요.', 'error');
-    toggleSettings(true);
+    if (boxEl.classList.contains('active')) {
+      boxEl.classList.remove('active');
+      boxEl.style.display = 'none';
+      btnEl.innerHTML = '📰 본문 미리보기';
+      return null;
+    }
+    const cleanText = (item.description || item.content || '').replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ');
+    boxEl.innerHTML = `
+      <div style="line-height:1.6; color:var(--text-main); font-size:0.9rem;">
+        ${escapeHTML(cleanText.length > 250 ? cleanText.substring(0, 250) + '...' : cleanText)}
+      </div>
+      <div class="help-text" style="font-size:0.75rem; margin-top:12px; border-top: 1px solid var(--border-color); padding-top: 8px;">
+        💡 전체 내용의 AI 요약을 원하시면 ⚙️ <strong>설정</strong>에서 Gemini API 키를 등록하세요.
+      </div>`;
+    boxEl.classList.add('active');
+    boxEl.style.display = 'block';
+    btnEl.innerHTML = '📰 닫기';
     return null;
   }
 
@@ -260,4 +275,59 @@ const parseGeminiOutput = (text) => {
     <ul class="summary-list">${bulletsHTML}</ul>
     <div class="hashtags-container">${hashtagsHTML}</div>
   `;
+};
+
+/** 데일리 브리핑 배치 처리 (여러 기사 동시 요약) */
+export const fetchBatchBriefing = async (items) => {
+  const { key: apiKey } = getApiKey();
+  if (!apiKey) throw new Error('API 키가 설정되지 않았습니다.');
+
+  const articlesContext = items.map((item, idx) => `
+ID: ${idx}
+Title: ${item.title}
+Source: ${item.sourceName}
+Content: ${(item.description || item.content || '').replace(/<[^>]*>?/gm, '').substring(0, 500)}
+`).join('\n---\n');
+
+  const prompt = `You are an expert AI news curator. I will provide you with top trending news articles. 
+Generate a "Morning Briefing" based on these articles. 
+Your output MUST be a valid JSON object matching the following structure exactly, without any markdown formatting wrappers (like \`\`\`json):
+{
+  "insight": "A 3-sentence overall summary of today's most important trends across these articles in Korean.",
+  "hotIdxs": [Array of integers representing the IDs of the 1 to 3 MOST impactful/important articles. Choose carefully.],
+  "tags": [Array of 3 to 5 trending keywords across these articles, formatted as "#Keyword" in Korean or English]
+}
+
+Input Articles:
+${articlesContext}
+`;
+
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        responseMimeType: "application/json",
+      }
+    })
+  });
+
+  if (!res.ok) throw new Error(`API 오류: ${res.status}`);
+  const data = await res.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error('응답을 파싱할 수 없습니다.');
+
+  try {
+    const result = JSON.parse(text);
+    return {
+      insight: result.insight,
+      hotLinks: result.hotIdxs.map(idx => items[idx]?.link).filter(Boolean),
+      tags: result.tags
+    };
+  } catch (e) {
+    throw new Error('JSON 파싱 실패');
+  }
 };

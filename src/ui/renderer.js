@@ -1,10 +1,10 @@
-// === AI Daily — 그리드 렌더링 & 페이지네이션 ===
-import state, { saveState } from '../state.js';
+import state, { saveState, getApiKey } from '../state.js';
 import { CATEGORY, PAGE_SIZE, MAX_READ_ITEMS } from '../config.js';
 import { escapeHTML, timeAgo, calculateReadingTime } from '../utils.js';
 import { isBookmarked, toggleBookmark } from '../features/bookmarks.js';
 import { shareArticle, copySummaryText } from '../features/share.js';
-import { handleSummary } from '../api.js';
+import { renderBriefingPanel } from '../features/briefing.js';
+import { openInAppReader } from '../features/reader.js';
 
 const newsGrid = document.getElementById('newsGrid');
 
@@ -14,6 +14,11 @@ let currentFilter = 'all';
 let currentSearch = '';
 let displayedCount = 0;
 
+// 브리핑 상태
+let briefingActive = false;
+let briefingContainerHtml = null;
+let hotLinksSet = new Set();
+
 // 읽은 기사 추적 (Set 기반)
 let readItemsSet = new Set(state.readItems);
 
@@ -21,6 +26,9 @@ let readItemsSet = new Set(state.readItems);
 export const setNewsItems = (items) => {
   allNewsItems = items;
   displayedCount = 0;
+  briefingActive = false;
+  briefingContainerHtml = null;
+  hotLinksSet.clear();
   updateFilterCounts();
   renderGrid();
 };
@@ -55,6 +63,33 @@ const renderGrid = () => {
   displayedCount = Math.min(PAGE_SIZE, filtered.length);
   newsGrid.innerHTML = '';
 
+  // 브리핑 패널 렌더링 (전체 탭일 때만)
+  if (currentFilter === 'all' && !currentSearch) {
+    const briefingWrapper = document.createElement('div');
+    briefingWrapper.className = 'briefing-wrapper';
+    
+    if (briefingActive && briefingContainerHtml) {
+      briefingWrapper.innerHTML = briefingContainerHtml;
+    } else {
+      briefingWrapper.innerHTML = `<button class="btn-primary" id="startBriefingBtn" style="width: 100%; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; font-weight: bold;">☀️ 오늘의 AI 집중 브리핑 생성 (최신 10개)</button>`;
+    }
+    newsGrid.appendChild(briefingWrapper);
+
+    if (!briefingActive) {
+      const btn = briefingWrapper.querySelector('#startBriefingBtn');
+      if (btn) {
+        btn.addEventListener('click', () => {
+          briefingActive = true;
+          renderBriefingPanel(briefingWrapper, filtered.slice(0, 10), (hotLinks) => {
+            hotLinksSet = new Set(hotLinks);
+            briefingContainerHtml = briefingWrapper.innerHTML;
+            renderGrid(); // 재렌더링하여 HOT 뱃지 적용
+          });
+        });
+      }
+    }
+  }
+
   renderItems(filtered, 0, displayedCount);
   renderLoadMoreUI(filtered);
 };
@@ -77,11 +112,12 @@ const renderItems = (filtered, from, to) => {
     card.innerHTML = `
       <div class="card-header">
         <span class="source-badge">${safeSourceName}</span>
+        ${hotLinksSet.has(item.link) ? '<span class="hot-badge">🔥 HOT</span>' : ''}
         <span class="pub-date">${timeAgo(item.pubDate)} · ⏱️ ${calculateReadingTime(item.content || item.description)}분 읽기</span>
       </div>
       <a href="${safeLink}" target="_blank" rel="noopener noreferrer" class="card-title js-link">${safeTitle}</a>
       <div class="card-actions">
-        <button class="btn-summary js-summary-btn" aria-label="${safeTitle} 요약보기">✨ 요약보기</button>
+        <button class="btn-summary js-summary-btn" aria-label="${safeTitle} 요약보기">${getApiKey().key ? '✨ 요약보기' : '📰 본문 미리보기'}</button>
         <div class="card-actions-right">
           <button class="btn-share js-share-btn" aria-label="공유">🔗 공유</button>
           <button class="btn-bookmark js-bookmark-btn" aria-label="즐겨찾기" title="즐겨찾기">${bookmarked ? '⭐' : '☆'}</button>
@@ -90,8 +126,13 @@ const renderItems = (filtered, from, to) => {
       <div class="summary-box js-summary-box" role="region" aria-label="요약 결과"></div>
     `;
 
-    // 링크 클릭 → 읽음 처리
-    card.querySelector('.js-link').addEventListener('click', () => markAsRead(item.link, card));
+    // 링크 클릭 → 읽음 처리 및 리더 모드 열기
+    const titleLink = card.querySelector('.js-link');
+    titleLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      markAsRead(item.link, card);
+      openInAppReader(item.link, item.title);
+    });
 
     // 요약 버튼
     const sumBtn = card.querySelector('.js-summary-btn');
