@@ -1,5 +1,5 @@
 // === AI Daily — Service Worker ===
-const CACHE_NAME = 'ai-daily-v2.3.0';
+const CACHE_NAME = 'ai-daily-v2.4.0';
 
 // 프리캐시할 App Shell (빌드 후 경로는 Vite가 결정)
 const APP_SHELL = [

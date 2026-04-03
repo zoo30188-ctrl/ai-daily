@@ -41,9 +41,10 @@
   <nav class="controls-container" aria-label="기사 필터 및 검색">
     <div class="filter-tabs" id="filterTabs" role="tablist" aria-label="카테고리 필터">
       <button class="tab-btn active" data-filter="all" role="tab" aria-selected="true">전체</button>
-      <button class="tab-btn" data-filter="blog" role="tab" aria-selected="false">블로그</button>
-      <button class="tab-btn" data-filter="newsletter" role="tab" aria-selected="false">뉴스레터</button>
-      <button class="tab-btn" data-filter="youtube" role="tab" aria-selected="false">YouTube</button>
+      <button class="tab-btn" data-filter="research" role="tab" aria-selected="false">🔬 연구/기술</button>
+      <button class="tab-btn" data-filter="news" role="tab" aria-selected="false">📰 업계 소식</button>
+      <button class="tab-btn" data-filter="column" role="tab" aria-selected="false">💡 인사이트</button>
+      <button class="tab-btn" data-filter="youtube" role="tab" aria-selected="false">▶️ YouTube</button>
       <button class="tab-btn" data-filter="bookmarks" role="tab" aria-selected="false">⭐ 즐겨찾기</button>
     </div>
     <div class="search-bar">
@@ -109,8 +110,9 @@
           <input type="text" id="newSourceName" placeholder="소스 이름 (예: TechCrunch)">
           <input type="url" id="newSourceUrl" placeholder="RSS 피드 URL (https://...)">
           <select id="newSourceCategory">
-            <option value="blog">블로그</option>
-            <option value="newsletter">뉴스레터</option>
+            <option value="research">연구/기술 (Research)</option>
+            <option value="news">업계 소식 (News)</option>
+            <option value="column">인사이트 (Column)</option>
             <option value="youtube">YouTube</option>
           </select>
           <button class="btn-add-source" id="addSourceBtn">➕ 소스 추가</button>
@@ -130,7 +132,7 @@
       </div>
 
       <div class="settings-footer">
-        <span>AI Daily v2.2.0 · Vite · GitHub Pages</span>
+        <span>AI Daily v2.4.0 · Vite · GitHub Pages</span>
       </div>
     </div>
   </div>

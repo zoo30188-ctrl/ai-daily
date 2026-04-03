@@ -1,8 +1,16 @@
 // === AI Daily — 설정 및 상수 ===
 
-export const APP_VERSION = 'v2.3.0';
+export const APP_VERSION = 'v2.4.0';
 
 export const CHANGELOG = [
+  {
+    version: 'v2.4.0',
+    date: '2026-04-03',
+    changes: [
+      { type: 'feat', text: 'AI 소스 전면 개편: 리서치 기관 및 AI 하이엔드 전문 매체로 라인업 전격 교체' },
+      { type: 'arch', text: '카테고리 시스템 변경 (연구/기술, 업계 소식, 칼럼/인사이트)' }
+    ]
+  },
   {
     version: 'v2.3.0',
     date: '2026-04-03',
@@ -109,28 +117,33 @@ export const CHANGELOG = [
 ];
 
 export const CATEGORY = {
-  BLOG: 'blog',
-  NEWSLETTER: 'newsletter',
+  RESEARCH: 'research',
+  NEWS: 'news',
+  COLUMN: 'column',
   YOUTUBE: 'youtube'
 };
 
 export const DEFAULT_SOURCES = [
-  // 블로그/미디어
-  { id: 'openai', name: 'OpenAI', url: 'https://openai.com/blog/rss.xml', category: CATEGORY.BLOG },
-  { id: 'anthropic', name: 'Anthropic (HN)', url: 'https://hnrss.org/newest?q=Anthropic', category: CATEGORY.BLOG },
-  { id: 'google_ai', name: 'Google AI', url: 'https://blog.google/technology/ai/rss/', category: CATEGORY.BLOG },
-  { id: 'huggingface', name: 'Hugging Face', url: 'https://huggingface.co/blog/feed.xml', category: CATEGORY.BLOG },
-  { id: 'verge', name: 'The Verge AI', url: 'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml', category: CATEGORY.BLOG },
-  { id: 'techcrunch', name: 'TechCrunch AI', url: 'https://techcrunch.com/category/artificial-intelligence/feed/', category: CATEGORY.BLOG },
-  // 뉴스레터
-  { id: 'lenny', name: "Lenny's Newsletter", url: 'https://www.lennysnewsletter.com/feed', category: CATEGORY.NEWSLETTER },
-  { id: 'chamath', name: 'Chamath', url: 'https://chamath.substack.com/feed', category: CATEGORY.NEWSLETTER },
-  { id: 'sandhill', name: 'sandhill.io', url: 'https://www.sandhill.io/feed', category: CATEGORY.NEWSLETTER },
-  // YouTube (기본 비활성화)
+  // 1. 연구 & 기술 (Research & Tech)
+  { id: 'openai', name: 'OpenAI (Official)', url: 'https://openai.com/blog/rss.xml', category: CATEGORY.RESEARCH },
+  { id: 'google_ai', name: 'Google AI', url: 'https://blog.google/technology/ai/rss/', category: CATEGORY.RESEARCH },
+  { id: 'huggingface', name: 'Hugging Face', url: 'https://huggingface.co/blog/feed.xml', category: CATEGORY.RESEARCH },
+  { id: 'bair', name: 'Berkeley AI (BAIR)', url: 'https://bair.berkeley.edu/blog/feed.xml', category: CATEGORY.RESEARCH },
+  
+  // 2. 업계 소식 & 트렌드 (News & Trends)
+  { id: 'mit_tech', name: 'MIT Tech Review', url: 'https://www.technologyreview.com/topic/artificial-intelligence/feed', category: CATEGORY.NEWS },
+  { id: 'techcrunch', name: 'TechCrunch AI', url: 'https://techcrunch.com/category/artificial-intelligence/feed/', category: CATEGORY.NEWS },
+  { id: 'ai_news', name: 'AI News', url: 'https://www.artificialintelligence-news.com/feed/', category: CATEGORY.NEWS },
+  { id: 'marktechpost', name: 'MarkTechPost', url: 'https://www.marktechpost.com/feed/', category: CATEGORY.NEWS },
+  { id: 'verge', name: 'The Verge AI', url: 'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml', category: CATEGORY.NEWS },
+
+  // 3. 칼럼 & 인사이트 (Insights / Newsletters)
+  { id: 'anthropic_hn', name: 'Anthropic (HN)', url: 'https://hnrss.org/newest?q=Anthropic', category: CATEGORY.COLUMN },
+  { id: 'towards_ds', name: 'Towards Data Science', url: 'https://towardsdatascience.com/feed', category: CATEGORY.COLUMN },
+
+  // 4. YouTube (기존 유지)
   { id: 'yt_openai', name: 'YouTube (OpenAI)', url: 'https://www.youtube.com/feeds/videos.xml?channel_id={OPENAI_CHANNEL_ID}', category: CATEGORY.YOUTUBE, defaultEnabled: false },
-  { id: 'yt_anthropic', name: 'YouTube (Anthropic)', url: 'https://www.youtube.com/feeds/videos.xml?channel_id={ANTHROPIC_CHANNEL_ID}', category: CATEGORY.YOUTUBE, defaultEnabled: false },
-  { id: 'yt_species', name: 'YouTube (Species)', url: 'https://www.youtube.com/feeds/videos.xml?channel_id={SPECIES_CHANNEL_ID}', category: CATEGORY.YOUTUBE, defaultEnabled: false },
-  { id: 'yt_josh', name: 'YouTube (빌더조쉬)', url: 'https://www.youtube.com/feeds/videos.xml?channel_id={BUILDERJOSH_CHANNEL_ID}', category: CATEGORY.YOUTUBE, defaultEnabled: false },
+  { id: 'yt_josh', name: 'YouTube (빌더조쉬)', url: 'https://www.youtube.com/feeds/videos.xml?channel_id={BUILDERJOSH_CHANNEL_ID}', category: CATEGORY.YOUTUBE, defaultEnabled: false }
 ];
 
 /** 기본 소스 + 사용자 커스텀 소스 병합 */
