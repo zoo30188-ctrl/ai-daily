@@ -65,6 +65,13 @@ if ('serviceWorker' in navigator) {
     .catch(err => console.warn('SW registration skipped:', err.message));
 }
 
+// 최초 로드 완료 시 최신 pubDate 기록
+const originalSetNewsItems = setNewsItems;
+export const wrappedSetNewsItems = (items) => {
+  if (items && items.length > 0) latestPubDate = new Date(items[0].pubDate).getTime();
+  originalSetNewsItems(items);
+};
+
 // 초기 데이터 로드
 fetchRSS(false, false, wrappedSetNewsItems);
 
@@ -102,13 +109,6 @@ const setupAutoRefresh = () => {
       });
     }, intervalMin * 60 * 1000);
   }
-};
-
-// 최초 로드 완료 시 최신 pubDate 기록
-const originalSetNewsItems = setNewsItems;
-export const wrappedSetNewsItems = (items) => {
-  if (items.length > 0) latestPubDate = new Date(items[0].pubDate).getTime();
-  originalSetNewsItems(items);
 };
 
 setupAutoRefresh();
