@@ -2,11 +2,16 @@
 import state, { saveState } from '../state.js';
 import { APP_VERSION, CHANGELOG } from '../config.js';
 import { escapeHTML } from '../utils.js';
+import { createFocusTrap } from '../utils/focus-trap.js';
 
 const versionBadge = document.getElementById('versionBadge');
 const changelogOverlay = document.getElementById('changelogOverlay');
+const changelogModal = changelogOverlay.querySelector('.changelog-modal');
 const closeChangelogBtn = document.getElementById('closeChangelogBtn');
 const changelogBody = document.getElementById('changelogBody');
+
+// Focus Trap
+const changelogFocusTrap = createFocusTrap(changelogModal);
 
 /** 체인지로그 팝업 열기 */
 export const openChangelog = () => {
@@ -23,6 +28,7 @@ export const openChangelog = () => {
   `).join('');
 
   changelogOverlay.classList.add('open');
+  changelogFocusTrap.activate();
 
   // 버전을 "본 것"으로 마킹
   if (state.lastSeenVersion !== APP_VERSION) {
@@ -35,6 +41,7 @@ export const openChangelog = () => {
 /** 체인지로그 닫기 */
 export const closeChangelog = () => {
   changelogOverlay.classList.remove('open');
+  changelogFocusTrap.deactivate();
 };
 
 /** 버전 배지 초기화 */

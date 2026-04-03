@@ -1,8 +1,19 @@
 // === AI Daily — 설정 및 상수 ===
 
-export const APP_VERSION = 'v2.0.0';
+export const APP_VERSION = 'v2.1.0';
 
 export const CHANGELOG = [
+  {
+    version: 'v2.1.0',
+    date: '2026-04-03',
+    changes: [
+      { type: 'security', text: 'API 키 .env.local 환경변수 지원 — localStorage 폴백 병행' },
+      { type: 'feat', text: 'Focus Trap — 설정 패널·체인지로그 모달에서 Tab 키 순환' },
+      { type: 'feat', text: 'API 키 마스킹 토글 (👁️) — 키 확인/숨기기 전환' },
+      { type: 'feat', text: '설정 패널 하단 앱 정보 표시' },
+      { type: 'fix', text: '색상 대비 개선 — --text-muted WCAG AA 4.5:1 준수' },
+    ]
+  },
   {
     version: 'v2.0.0',
     date: '2026-04-03',

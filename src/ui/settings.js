@@ -1,8 +1,9 @@
 // === AI Daily — 설정 패널 ===
-import state, { saveState } from '../state.js';
+import state, { saveState, getApiKey } from '../state.js';
 import { showToast } from './toast.js';
-import { LANG_MAP } from '../config.js';
+import { LANG_MAP, APP_VERSION } from '../config.js';
 import { initTheme } from './theme.js';
+import { createFocusTrap } from '../utils/focus-trap.js';
 
 // DOM 요소
 const settingsBtn = document.getElementById('settingsBtn');
@@ -10,6 +11,8 @@ const closeSettingsBtn = document.getElementById('closeSettingsBtn');
 const backdrop = document.getElementById('backdrop');
 const settingsOverlay = document.getElementById('settingsOverlay');
 const geminiApiKeyInput = document.getElementById('geminiApiKey');
+const apiKeyToggleBtn = document.getElementById('apiKeyToggle');
+const apiKeyStatus = document.getElementById('apiKeyStatus');
 const sourceTogglesContainer = document.getElementById('sourceToggles');
 const summaryLangSelect = document.getElementById('summaryLang');
 const addSourceBtn = document.getElementById('addSourceBtn');
@@ -20,14 +23,36 @@ const exportBtn = document.getElementById('exportBtn');
 const importBtn = document.getElementById('importBtn');
 const importFileInput = document.getElementById('importFileInput');
 
+// Focus Trap
+const settingsFocusTrap = createFocusTrap(settingsOverlay);
+
 /** 설정 패널 열기/닫기 */
 export const toggleSettings = (show) => {
   if (show) {
     settingsOverlay.classList.add('open');
     backdrop.classList.add('open');
+    settingsFocusTrap.activate();
+    updateApiKeyStatus();
   } else {
     settingsOverlay.classList.remove('open');
     backdrop.classList.remove('open');
+    settingsFocusTrap.deactivate();
+  }
+};
+
+/** API 키 상태 표시 업데이트 */
+const updateApiKeyStatus = () => {
+  const { source } = getApiKey();
+  if (source === 'env') {
+    apiKeyStatus.textContent = '🔒 환경변수(.env.local)에서 로드됨';
+    apiKeyStatus.className = 'help-text api-key-env';
+    geminiApiKeyInput.placeholder = '환경변수 키 사용 중 (덮어쓰려면 입력)';
+  } else if (source === 'user') {
+    apiKeyStatus.textContent = '✅ 사용자 키 저장됨';
+    apiKeyStatus.className = 'help-text api-key-user';
+  } else {
+    apiKeyStatus.textContent = '⚠️ 키가 설정되지 않았습니다. 키는 브라우저 localStorage에 저장됩니다.';
+    apiKeyStatus.className = 'help-text';
   }
 };
 
@@ -161,7 +186,16 @@ export const initSettings = (getActiveSourcesFn) => {
   geminiApiKeyInput.addEventListener('change', (e) => {
     state.apiKey = e.target.value.trim();
     saveState();
-    showToast('설정이 임시 저장되었습니다.');
+    updateApiKeyStatus();
+    showToast('API 키가 저장되었습니다.');
+  });
+
+  // API 키 마스킹 토글
+  apiKeyToggleBtn.addEventListener('click', () => {
+    const isPassword = geminiApiKeyInput.type === 'password';
+    geminiApiKeyInput.type = isPassword ? 'text' : 'password';
+    apiKeyToggleBtn.textContent = isPassword ? '🔒' : '👁️';
+    apiKeyToggleBtn.title = isPassword ? '키 숨기기' : '키 보기';
   });
 
   renderSourceToggles(getActiveSourcesFn());
@@ -186,4 +220,7 @@ export const initSettings = (getActiveSourcesFn) => {
   settingsBtn.addEventListener('click', () => toggleSettings(true));
   closeSettingsBtn.addEventListener('click', () => toggleSettings(false));
   backdrop.addEventListener('click', () => toggleSettings(false));
+
+  // 초기 상태 표시
+  updateApiKeyStatus();
 };

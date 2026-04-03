@@ -72,8 +72,11 @@
         <h3>API & Storage</h3>
         <div class="input-wrapper">
           <label for="geminiApiKey">Gemini API Key (선택)</label>
-          <input type="password" id="geminiApiKey" class="text-input" placeholder="AI Studio에서 발급받은 키 입력">
-          <p class="help-text">⚠️ 키는 브라우저 localStorage에 저장됩니다. 공용 PC에서는 사용을 피하세요.</p>
+          <div class="api-key-row">
+            <input type="password" id="geminiApiKey" class="text-input" placeholder="AI Studio에서 발급받은 키 입력">
+            <button type="button" id="apiKeyToggle" class="btn-api-toggle" title="키 보기" aria-label="API 키 표시 토글">👁️</button>
+          </div>
+          <p class="help-text" id="apiKeyStatus">⚠️ 키는 브라우저 localStorage에 저장됩니다. 공용 PC에서는 사용을 피하세요.</p>
         </div>
         <div class="input-wrapper" style="margin-top: 1rem;">
           <label for="summaryLang">요약 언어</label>
@@ -109,6 +112,10 @@
           <button class="btn-settings-action" id="importBtn">📤 설정 가져오기</button>
         </div>
         <input type="file" id="importFileInput" accept=".json" style="display: none;">
+      </div>
+
+      <div class="settings-footer">
+        <span>AI Daily v2.1.0 · Vite · GitHub Pages</span>
       </div>
     </div>
   </div>

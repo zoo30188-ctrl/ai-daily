@@ -44,4 +44,18 @@ export const updateState = (updates) => {
   saveState();
 };
 
+/** .env.local의 API 키 (빌드 타임 주입) */
+const ENV_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
+
+/**
+ * API 키 반환 (우선순위: localStorage > .env.local)
+ * @returns {{ key: string, source: 'user' | 'env' | 'none' }}
+ */
+export const getApiKey = () => {
+  if (state.apiKey) return { key: state.apiKey, source: 'user' };
+  if (ENV_API_KEY) return { key: ENV_API_KEY, source: 'env' };
+  return { key: '', source: 'none' };
+};
+
 export default state;
+

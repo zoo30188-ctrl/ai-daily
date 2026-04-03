@@ -1,5 +1,5 @@
 // === AI Daily — API (RSS 페칭 + Gemini 요약) ===
-import state from './state.js';
+import state, { getApiKey } from './state.js';
 import { getActiveSources, LANG_MAP } from './config.js';
 import { getRSSCache, setRSSCache, getSummaryCache, setSummaryCache } from './cache.js';
 import { escapeHTML, friendlyError } from './utils.js';
@@ -123,7 +123,8 @@ export const handleSummary = async (item, btnEl, boxEl) => {
     return boxEl.querySelector('.js-copy-btn');
   }
 
-  if (!state.apiKey) {
+  const { key: apiKey, source: keySource } = getApiKey();
+  if (!apiKey) {
     showToast('우측 상단 ⚙️ 설정에서 Gemini API 키를 먼저 입력해주세요.', 'error');
     toggleSettings(true);
     return null;
@@ -158,7 +159,8 @@ export const handleSummary = async (item, btnEl, boxEl) => {
 
 /** Gemini API 호출 */
 const fetchGeminiSummary = async (title, rawContent) => {
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${state.apiKey}`;
+  const { key: apiKey } = getApiKey();
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
   const safeContent = rawContent.replace(/<[^>]*>?/gm, '').substring(0, 3000);
 
   const lang = state.summaryLang || 'ko';

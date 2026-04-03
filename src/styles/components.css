@@ -564,3 +564,49 @@ input:checked + .slider:before {
   flex-shrink: 0;
 }
 .btn-delete-source:hover { background: rgba(226, 92, 92, 0.1); }
+
+/* API 키 입력 행 */
+.api-key-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.api-key-row .text-input {
+  flex: 1;
+}
+
+.btn-api-toggle {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+.btn-api-toggle:hover { background: var(--highlight); }
+
+/* API 키 상태 표시 */
+.help-text.api-key-env {
+  color: #6ec87a;
+}
+.help-text.api-key-user {
+  color: #9cb2d2;
+}
+
+/* 설정 패널 하단 앱 정보 */
+.settings-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
