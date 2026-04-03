@@ -1,0 +1,262 @@
+/* === AI Daily — Overlays (Settings, Changelog, Toast, Offline) === */
+
+/* 설정 오버레이 */
+.settings-overlay {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  max-width: 400px;
+  height: 100vh;
+  background: var(--card-bg);
+  border-left: 1px solid var(--border-color);
+  z-index: 200;
+  transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+}
+
+.settings-overlay.open { right: 0; }
+
+.settings-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.settings-content {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.settings-group {
+  margin-bottom: 2rem;
+}
+
+.settings-group h3 {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+
+/* 백드롭 */
+.backdrop {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(2px);
+  z-index: 150;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.backdrop.open {
+  display: block;
+  opacity: 1;
+}
+
+/* 토스트 */
+.toast-container {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.toast {
+  background: var(--toast-bg);
+  color: #fff;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  border-left: 4px solid var(--accent);
+  font-size: 0.9rem;
+  transform: translateY(100%);
+  opacity: 0;
+  animation: slideUpToast 0.3s forwards;
+}
+.toast.error { border-left-color: #e25c5c; }
+.toast.fade-out { animation: fadeOutToast 0.3s forwards; }
+
+/* 오프라인 배너 */
+.offline-banner {
+  background: linear-gradient(90deg, #e25c5c, #c94444);
+  color: #fff;
+  text-align: center;
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.offline-banner.visible { display: flex; }
+
+/* 체인지로그 모달 */
+.changelog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.changelog-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.changelog-modal {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 520px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  transform: translateY(20px) scale(0.95);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.changelog-overlay.open .changelog-modal {
+  transform: translateY(0) scale(1);
+}
+
+.changelog-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.changelog-header h2 {
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.changelog-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.changelog-version-block { margin-bottom: 1.5rem; }
+.changelog-version-block:last-child { margin-bottom: 0; }
+
+.changelog-version-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.25rem;
+}
+
+.changelog-version-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.changelog-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.changelog-list li {
+  font-size: 0.85rem;
+  color: var(--text-main);
+  padding-left: 1.2rem;
+  position: relative;
+  line-height: 1.5;
+}
+
+.changelog-list li::before {
+  position: absolute;
+  left: 0;
+  font-size: 0.75rem;
+}
+
+.changelog-list li.feat::before { content: "✨"; }
+.changelog-list li.fix::before { content: "🔧"; }
+.changelog-list li.security::before { content: "🛡️"; }
+.changelog-list li.perf::before { content: "⚡"; }
+.changelog-list li.docs::before { content: "📝"; }
+.changelog-list li.arch::before { content: "🏗️"; }
+
+.changelog-tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  margin-left: 0.4rem;
+  vertical-align: middle;
+}
+
+.changelog-tag.breaking {
+  background: rgba(226, 92, 92, 0.15);
+  color: #e25c5c;
+}
+
+.changelog-tag.new {
+  background: rgba(110, 200, 122, 0.15);
+  color: #6ec87a;
+}
+
+/* Import/Export 버튼 */
+.settings-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn-settings-action {
+  flex: 1;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+.btn-settings-action:hover {
+  background: var(--highlight);
+  color: #fff;
+}

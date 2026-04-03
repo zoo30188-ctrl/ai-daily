@@ -1,0 +1,51 @@
+/* === AI Daily — CSS Variables (Dark & Light Theme) === */
+@import url("https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap");
+
+:root {
+  --bg-color: #171614;
+  --card-bg: #1c1b19;
+  --text-main: #cdccca;
+  --text-muted: #8a8886;
+  --accent: #e2dfda;
+  --border-color: #2c2b29;
+  --highlight: rgba(255, 255, 255, 0.05);
+  --font-family: 'Satoshi', sans-serif;
+  --radius: 12px;
+  --transition: 0.2s ease;
+  --header-bg: rgba(23, 22, 20, 0.85);
+  --toast-bg: #2a2927;
+  --skeleton-base: #2a2927;
+  --skeleton-shine: #353432;
+  --hashtag-color: #9cb2d2;
+  --hashtag-bg: rgba(156, 178, 210, 0.1);
+}
+
+/* 라이트 테마 */
+[data-theme="light"] {
+  --bg-color: #f5f3f0;
+  --card-bg: #ffffff;
+  --text-main: #3a3a3a;
+  --text-muted: #7a7a7a;
+  --accent: #2c2b29;
+  --border-color: #e0ddd8;
+  --highlight: rgba(0, 0, 0, 0.04);
+  --header-bg: rgba(245, 243, 240, 0.9);
+  --toast-bg: #ffffff;
+  --skeleton-base: #e8e6e3;
+  --skeleton-shine: #f0eeeb;
+  --hashtag-color: #4a6fa5;
+  --hashtag-bg: rgba(74, 111, 165, 0.08);
+}
+
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3 { color: #1a1a1a; }
+
+[data-theme="light"] .card-title { color: #1a1a1a; }
+[data-theme="light"] .search-input { color: #1a1a1a; }
+[data-theme="light"] .text-input { color: #1a1a1a; }
+[data-theme="light"] .changelog-version-title { color: #1a1a1a; }
+[data-theme="light"] .toast { color: #1a1a1a; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+[data-theme="light"] .scroll-top-btn { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+[data-theme="light"] .language-select { color: #1a1a1a; }
+[data-theme="light"] .custom-source-form input { color: #1a1a1a; }
