@@ -15,12 +15,14 @@ const apiKeyToggleBtn = document.getElementById('apiKeyToggle');
 const apiKeyStatus = document.getElementById('apiKeyStatus');
 const sourceTogglesContainer = document.getElementById('sourceToggles');
 const summaryLangSelect = document.getElementById('summaryLang');
+const autoRefreshIntervalSelect = document.getElementById('autoRefreshInterval');
 const addSourceBtn = document.getElementById('addSourceBtn');
 const newSourceName = document.getElementById('newSourceName');
 const newSourceUrl = document.getElementById('newSourceUrl');
 const newSourceCategory = document.getElementById('newSourceCategory');
 const exportBtn = document.getElementById('exportBtn');
 const importBtn = document.getElementById('importBtn');
+const resetDataBtn = document.getElementById('resetDataBtn');
 const importFileInput = document.getElementById('importFileInput');
 
 // Focus Trap
@@ -200,7 +202,6 @@ export const initSettings = (getActiveSourcesFn) => {
 
   renderSourceToggles(getActiveSourcesFn());
 
-  // 언어 설정
   summaryLangSelect.value = state.summaryLang || 'ko';
   summaryLangSelect.addEventListener('change', (e) => {
     state.summaryLang = e.target.value;
@@ -208,13 +209,32 @@ export const initSettings = (getActiveSourcesFn) => {
     showToast(`요약 언어: ${LANG_MAP[e.target.value].name}`);
   });
 
+  // 자동 새로고침 설정
+  autoRefreshIntervalSelect.value = state.autoRefreshInterval || '0';
+  autoRefreshIntervalSelect.addEventListener('change', (e) => {
+    state.autoRefreshInterval = e.target.value;
+    saveState();
+    const min = e.target.value;
+    showToast(min === '0' ? '자동 새로고침이 꺼졌습니다.' : `${min}분 간격으로 자동 새로고침합니다.`);
+    // 변경 시 즉시 반영을 위해 페이지 새로고침 권장
+    if (min !== '0') setTimeout(() => window.location.reload(), 1500);
+  });
+
   // 소스 추가
   addSourceBtn.addEventListener('click', () => addCustomSource(getActiveSourcesFn));
 
-  // Import/Export
+  // Import/Export / Reset
   exportBtn.addEventListener('click', exportSettings);
   importBtn.addEventListener('click', () => importFileInput.click());
   importFileInput.addEventListener('change', importSettings);
+  
+  resetDataBtn.addEventListener('click', () => {
+    if (confirm('⚠️ 모든 설정, 북마크, 읽은 기사, 캐시 데이터를 완전히 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.reload();
+    }
+  });
 
   // 패널 토글
   settingsBtn.addEventListener('click', () => toggleSettings(true));

@@ -16,6 +16,7 @@ const defaultState = {
   theme: 'dark',
   bookmarks: [],
   summaryLang: 'ko',
+  autoRefreshInterval: '0', // 0: disabled, 15, 30, 60 (in minutes)
 };
 
 /** 현재 상태 (localStorage에서 로드) */

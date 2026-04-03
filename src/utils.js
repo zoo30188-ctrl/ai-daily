@@ -34,3 +34,10 @@ export const friendlyError = (err) => {
   if (msg.includes('SAFETY')) return 'AI 안전 필터에 의해 요약이 제한되었습니다.';
   return msg;
 };
+
+/** 예상 읽기 시간 계산 (단어수 / 250 기준) */
+export const calculateReadingTime = (text) => {
+  if (!text) return 1;
+  const wordCount = text.replace(/<[^>]*>?/gm, '').split(/\s+/).length;
+  return Math.max(1, Math.ceil(wordCount / 250));
+};

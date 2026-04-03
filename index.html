@@ -16,9 +16,11 @@
 </head>
 <body>
 
-  <!-- 오프라인 배너 -->
   <div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
     📡 오프라인 상태입니다. 캐시된 기사를 표시합니다.
+  </div>
+  <div class="offline-banner" id="newArticlesBanner" style="display:none; background:var(--hashtag-color); color:var(--bg-color); cursor:pointer;" role="alert" aria-live="polite">
+    🔔 새로운 기사가 있습니다. 클릭하여 확인하세요.
   </div>
 
   <!-- 헤더 -->
@@ -88,6 +90,16 @@
           </select>
           <p class="help-text">AI 요약 결과가 선택한 언어로 출력됩니다.</p>
         </div>
+        <div class="input-wrapper" style="margin-top: 1rem;">
+          <label for="autoRefreshInterval">자동 새로고침</label>
+          <select id="autoRefreshInterval" class="language-select">
+            <option value="0">사용 안 함</option>
+            <option value="15">15분마다</option>
+            <option value="30">30분마다</option>
+            <option value="60">1시간마다</option>
+          </select>
+          <p class="help-text">설정한 간격마다 백그라운드에서 기사를 갱신합니다.</p>
+        </div>
       </div>
 
       <div class="settings-group">
@@ -111,11 +123,14 @@
           <button class="btn-settings-action" id="exportBtn">📥 설정 내보내기</button>
           <button class="btn-settings-action" id="importBtn">📤 설정 가져오기</button>
         </div>
+        <div class="settings-actions" style="margin-top: 0.5rem;">
+          <button class="btn-settings-action btn-danger" id="resetDataBtn">🗑️ 모든 데이터 초기화</button>
+        </div>
         <input type="file" id="importFileInput" accept=".json" style="display: none;">
       </div>
 
       <div class="settings-footer">
-        <span>AI Daily v2.1.0 · Vite · GitHub Pages</span>
+        <span>AI Daily v2.2.0 · Vite · GitHub Pages</span>
       </div>
     </div>
   </div>

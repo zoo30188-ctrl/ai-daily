@@ -1,8 +1,20 @@
 // === AI Daily — 설정 및 상수 ===
 
-export const APP_VERSION = 'v2.1.0';
+export const APP_VERSION = 'v2.2.0';
 
 export const CHANGELOG = [
+  {
+    version: 'v2.2.0',
+    date: '2026-04-03',
+    changes: [
+      { type: 'feat', text: '백그라운드 자동 새로고침(15/30/60분) 설정 추가 (UX 고도화)' },
+      { type: 'feat', text: '북마크 데이터 영구 저장화 — 피드 만료 후에도 접근 가능' },
+      { type: 'perf', text: 'AI 요약 결과 localStorage 캐싱 — 브라우저 재시작 시에도 유지' },
+      { type: 'feat', text: '기사 목록에 예상 읽기 시간(⏱️ N분 읽기) 표시 추가' },
+      { type: 'feat', text: '요약 박스 강제 재요약(🔄) 버튼 추가 — 캐시된 잘못된 요약 수정' },
+      { type: 'feat', text: '설정 패널에 모든 데이터 비우기(초기화) 버튼 추가' }
+    ]
+  },
   {
     version: 'v2.1.0',
     date: '2026-04-03',

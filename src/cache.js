@@ -32,7 +32,7 @@ const SUMMARY_CACHE_KEY = 'ai_daily_summary_cache';
 /** 요약 캐시 조회 */
 export const getSummaryCache = (url) => {
   try {
-    const cache = JSON.parse(sessionStorage.getItem(SUMMARY_CACHE_KEY) || '{}');
+    const cache = JSON.parse(localStorage.getItem(SUMMARY_CACHE_KEY) || '{}');
     return cache[url] || null;
   } catch { return null; }
 };
@@ -40,12 +40,12 @@ export const getSummaryCache = (url) => {
 /** 요약 캐시 저장 (FIFO 100건 제한) */
 export const setSummaryCache = (url, html) => {
   try {
-    const cache = JSON.parse(sessionStorage.getItem(SUMMARY_CACHE_KEY) || '{}');
+    const cache = JSON.parse(localStorage.getItem(SUMMARY_CACHE_KEY) || '{}');
     const keys = Object.keys(cache);
     if (keys.length >= MAX_SUMMARY_CACHE) {
       delete cache[keys[0]];
     }
     cache[url] = html;
-    sessionStorage.setItem(SUMMARY_CACHE_KEY, JSON.stringify(cache));
+    localStorage.setItem(SUMMARY_CACHE_KEY, JSON.stringify(cache));
   } catch { /* 무시 */ }
 };

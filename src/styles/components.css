@@ -610,3 +610,34 @@ input:checked + .slider:before {
   color: var(--text-muted);
   letter-spacing: 0.02em;
 }
+
+/* 위험 버튼 (데이터 삭제) */
+.btn-settings-action.btn-danger {
+  color: #e25c5c;
+  border-color: rgba(226, 92, 92, 0.3);
+}
+.btn-settings-action.btn-danger:hover {
+  background: rgba(226, 92, 92, 0.1);
+  color: #e25c5c;
+  border-color: rgba(226, 92, 92, 0.5);
+}
+
+/* 작은 아이콘 버튼 (강제 재요약용) */
+.btn-icon-small {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-main);
+  padding: 0.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  margin-left: 0.3rem;
+}
+.btn-icon-small:hover {
+  background: var(--highlight);
+  border-color: var(--border-color);
+}

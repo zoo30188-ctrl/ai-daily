@@ -13,24 +13,27 @@ const lastUpdatedText = document.getElementById('lastUpdatedText');
 /**
  * RSS 피드 수집
  * @param {boolean} forceRefresh - true면 캐시 무시
+ * @param {boolean} silent - true면 로딩 UI/스크롤 이동 없이 조용히 백그라운드 패치 (R6)
  * @param {Function} onComplete - 완료 후 콜백 (allNewsItems 전달)
  */
-export const fetchRSS = async (forceRefresh = false, onComplete) => {
-  refreshBtn.style.transform = 'rotate(180deg)';
-  refreshBtn.style.transition = 'transform 0.5s';
-  newsGrid.setAttribute('aria-busy', 'true');
+export const fetchRSS = async (forceRefresh = false, silent = false, onComplete) => {
+  if (!silent) {
+    refreshBtn.style.transform = 'rotate(180deg)';
+    refreshBtn.style.transition = 'transform 0.5s';
+    newsGrid.setAttribute('aria-busy', 'true');
 
-  // 스켈레톤 UI
-  newsGrid.innerHTML = Array.from({ length: 6 }).map(() => `
-    <div class="card" aria-hidden="true">
-      <div class="skeleton sk-line short" style="margin-bottom: 20px;"></div>
-      <div class="skeleton sk-title"></div>
-      <div class="skeleton sk-title short"></div>
-      <div style="margin-top: auto; padding-top: 10px;">
-        <div class="skeleton sk-line" style="width: 80px;"></div>
+    // 스켈레톤 UI
+    newsGrid.innerHTML = Array.from({ length: 6 }).map(() => `
+      <div class="card" aria-hidden="true">
+        <div class="skeleton sk-line short" style="margin-bottom: 20px;"></div>
+        <div class="skeleton sk-title"></div>
+        <div class="skeleton sk-title short"></div>
+        <div style="margin-top: auto; padding-top: 10px;">
+          <div class="skeleton sk-line" style="width: 80px;"></div>
+        </div>
       </div>
-    </div>
-  `).join('');
+    `).join('');
+  }
 
   const allSources = getActiveSources(state.customSources);
   const activeSources = allSources.filter(src => state.sourcesConfig[src.id] !== false);
@@ -86,41 +89,60 @@ export const fetchRSS = async (forceRefresh = false, onComplete) => {
       }
     });
 
-    // 사용자 친화적 에러 메시지
-    if (failedSources.length > 0) {
-      showToast(`${failedSources.join(', ')} 소스를 불러오지 못했습니다.`, 'error');
-    } else if (items.length > 0) {
-      const cacheMsg = cacheHits > 0 ? ` (캐시 ${cacheHits}건)` : '';
-      showToast(`${items.length}개 기사를 불러왔습니다.${cacheMsg}`);
-    }
-
     // 날짜순 정렬 (최신 먼저)
     items.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 
-    const now = new Date();
-    lastUpdatedText.textContent = `마지막 갱신: ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    // 사용자 친화적 메시지는 silent 모드가 아닐 때만
+    if (!silent) {
+      if (failedSources.length > 0) {
+        showToast(`${failedSources.join(', ')} 소스를 불러오지 못했습니다.`, 'error');
+      } else if (items.length > 0) {
+        const cacheMsg = cacheHits > 0 ? ` (캐시 ${cacheHits}건)` : '';
+        showToast(`${items.length}개 기사를 불러왔습니다.${cacheMsg}`);
+      }
+      
+      const now = new Date();
+      lastUpdatedText.textContent = `마지막 갱신: ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    }
 
     if (onComplete) onComplete(items);
 
   } catch (err) {
-    showToast(friendlyError(err), 'error');
-    newsGrid.innerHTML = `<div class="status-message error-text">데이터 로드 실패: ${escapeHTML(friendlyError(err))}</div>`;
+    if (!silent) {
+      showToast(friendlyError(err), 'error');
+      newsGrid.innerHTML = `<div class="status-message error-text">데이터 로드 실패: ${escapeHTML(friendlyError(err))}</div>`;
+    }
   } finally {
-    newsGrid.setAttribute('aria-busy', 'false');
-    setTimeout(() => refreshBtn.style.transform = 'none', 500);
+    if (!silent) {
+      newsGrid.setAttribute('aria-busy', 'false');
+      setTimeout(() => refreshBtn.style.transform = 'none', 500);
+    }
   }
 };
 
 /** Gemini API로 기사 요약 처리 */
-export const handleSummary = async (item, btnEl, boxEl) => {
-  // 캐시 확인
-  const cached = getSummaryCache(item.link);
-  if (cached) {
-    boxEl.innerHTML = cached + `<button class="btn-copy-summary js-copy-btn">📋 요약 복사</button><span class="summary-cached-badge">(캐시됨)</span>`;
-    boxEl.classList.add('active');
-    boxEl.style.display = 'block';
-    btnEl.innerHTML = '✨ 다시 요약하기';
-    return boxEl.querySelector('.js-copy-btn');
+export const handleSummary = async (item, btnEl, boxEl, { force = false } = {}) => {
+  // 캐시 확인 (강제 재요약 시 무시)
+  if (!force) {
+    const cached = getSummaryCache(item.link);
+    if (cached) {
+      boxEl.innerHTML = cached + `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+          <button class="btn-copy-summary js-copy-btn">📋 요약 복사</button>
+          <div>
+            <span class="summary-cached-badge">(캐시됨)</span>
+            <button class="btn-icon-small js-force-summary" title="캐시 무시 강제 재요약">🔄</button>
+          </div>
+        </div>
+      `;
+      boxEl.classList.add('active');
+      boxEl.style.display = 'block';
+      btnEl.innerHTML = '✨ 다시 요약하기';
+      return { 
+        copyBtn: boxEl.querySelector('.js-copy-btn'),
+        forceBtn: boxEl.querySelector('.js-force-summary')
+      };
+    }
   }
 
   const { key: apiKey, source: keySource } = getApiKey();
@@ -147,7 +169,7 @@ export const handleSummary = async (item, btnEl, boxEl) => {
     boxEl.classList.add('active');
     btnEl.innerHTML = '✨ 다시 요약하기';
     setSummaryCache(item.link, summaryHtml);
-    return boxEl.querySelector('.js-copy-btn');
+    return { copyBtn: boxEl.querySelector('.js-copy-btn') };
   } catch (err) {
     boxEl.innerHTML = `<span class="error-text">요약 실패: ${escapeHTML(friendlyError(err))}</span>`;
     btnEl.innerHTML = '✨ 요약보기';

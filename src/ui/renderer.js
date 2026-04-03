@@ -1,7 +1,7 @@
 // === AI Daily — 그리드 렌더링 & 페이지네이션 ===
 import state, { saveState } from '../state.js';
 import { CATEGORY, PAGE_SIZE, MAX_READ_ITEMS } from '../config.js';
-import { escapeHTML, timeAgo } from '../utils.js';
+import { escapeHTML, timeAgo, calculateReadingTime } from '../utils.js';
 import { isBookmarked, toggleBookmark } from '../features/bookmarks.js';
 import { shareArticle, copySummaryText } from '../features/share.js';
 import { handleSummary } from '../api.js';
@@ -29,7 +29,7 @@ export const setNewsItems = (items) => {
 const getFilteredItems = () => {
   let filtered = allNewsItems;
   if (currentFilter === 'bookmarks') {
-    filtered = filtered.filter(item => isBookmarked(item.link));
+    filtered = state.bookmarks; // R7: 북마크 탭은 로컬 저장된 전체 북마크 객체 배열을 사용
   } else if (currentFilter !== 'all') {
     filtered = filtered.filter(item => item.category === currentFilter);
   }
@@ -77,7 +77,7 @@ const renderItems = (filtered, from, to) => {
     card.innerHTML = `
       <div class="card-header">
         <span class="source-badge">${safeSourceName}</span>
-        <span class="pub-date">${timeAgo(item.pubDate)}</span>
+        <span class="pub-date">${timeAgo(item.pubDate)} · ⏱️ ${calculateReadingTime(item.content || item.description)}분 읽기</span>
       </div>
       <a href="${safeLink}" target="_blank" rel="noopener noreferrer" class="card-title js-link">${safeTitle}</a>
       <div class="card-actions">
@@ -96,18 +96,25 @@ const renderItems = (filtered, from, to) => {
     // 요약 버튼
     const sumBtn = card.querySelector('.js-summary-btn');
     const sumBox = card.querySelector('.js-summary-box');
-    sumBtn.addEventListener('click', async () => {
+    
+    // 강제 요약 이벤트를 위한 래퍼 함수
+    const doSummary = async (forceOptions = {}) => {
       markAsRead(item.link, card);
-      const copyBtn = await handleSummary(item, sumBtn, sumBox);
-      if (copyBtn) {
-        copyBtn.addEventListener('click', () => copySummaryText(sumBox));
+      const res = await handleSummary(item, sumBtn, sumBox, forceOptions);
+      if (res?.copyBtn) {
+        res.copyBtn.addEventListener('click', () => copySummaryText(sumBox));
       }
-    });
+      if (res?.forceBtn) {
+        res.forceBtn.addEventListener('click', () => doSummary({ force: true }));
+      }
+    };
+    
+    sumBtn.addEventListener('click', () => doSummary({ force: false }));
 
     // 북마크 토글
     const bmBtn = card.querySelector('.js-bookmark-btn');
     bmBtn.addEventListener('click', () => {
-      toggleBookmark(item.link);
+      toggleBookmark(item); // R7: 객체 자체 전달
       bmBtn.textContent = isBookmarked(item.link) ? '⭐' : '☆';
       bmBtn.classList.toggle('active');
       updateFilterCounts();
@@ -165,7 +172,7 @@ const updateFilterCounts = () => {
   const filterTabs = document.querySelectorAll('.tab-btn');
   const counts = {
     all: allNewsItems.length,
-    bookmarks: allNewsItems.filter(item => isBookmarked(item.link)).length
+    bookmarks: state.bookmarks.length // R7: 전체 북마크 길이
   };
   Object.values(CATEGORY).forEach(cat => {
     counts[cat] = allNewsItems.filter(item => item.category === cat).length;
