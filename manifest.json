@@ -1,0 +1,17 @@
+{
+  "name": "AI Daily Dashboard",
+  "short_name": "AI Daily",
+  "description": "Personal AI News & Summarization Dashboard",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#171614",
+  "theme_color": "#171614",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
