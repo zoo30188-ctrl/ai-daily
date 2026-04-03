@@ -117,11 +117,11 @@ export const CATEGORY = {
 export const DEFAULT_SOURCES = [
   // 블로그/미디어
   { id: 'openai', name: 'OpenAI', url: 'https://openai.com/blog/rss.xml', category: CATEGORY.BLOG },
-  { id: 'anthropic', name: 'Anthropic', url: 'https://www.anthropic.com/news/rss', category: CATEGORY.BLOG },
-  { id: 'deepmind', name: 'Google DeepMind', url: 'https://deepmind.google/blog/rss/', category: CATEGORY.BLOG },
+  { id: 'anthropic', name: 'Anthropic (HN)', url: 'https://hnrss.org/newest?q=Anthropic', category: CATEGORY.BLOG },
+  { id: 'google_ai', name: 'Google AI', url: 'https://blog.google/technology/ai/rss/', category: CATEGORY.BLOG },
   { id: 'huggingface', name: 'Hugging Face', url: 'https://huggingface.co/blog/feed.xml', category: CATEGORY.BLOG },
   { id: 'verge', name: 'The Verge AI', url: 'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml', category: CATEGORY.BLOG },
-  { id: 'geeknews', name: 'GeekNews', url: 'https://news.hada.io/rss', category: CATEGORY.BLOG },
+  { id: 'techcrunch', name: 'TechCrunch AI', url: 'https://techcrunch.com/category/artificial-intelligence/feed/', category: CATEGORY.BLOG },
   // 뉴스레터
   { id: 'lenny', name: "Lenny's Newsletter", url: 'https://www.lennysnewsletter.com/feed', category: CATEGORY.NEWSLETTER },
   { id: 'chamath', name: 'Chamath', url: 'https://chamath.substack.com/feed', category: CATEGORY.NEWSLETTER },
